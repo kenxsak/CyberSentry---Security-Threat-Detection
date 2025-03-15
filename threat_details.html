@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threat Details - CyberSentry</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --success-color: #2ecc71;
+      --text-color: #333;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-color);
+      background-color: #f8f9fa;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px 5px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 0 0 5px 5px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 20px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .info-item {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      border-left: 4px solid var(--secondary-color);
+    }
+    
+    .info-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--primary-color);
+    }
+    
+    .info-value {
+      word-break: break-all;
+    }
+    
+    .threats-list {
+      margin-top: 20px;
+    }
+    
+    .threat-item {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      background-color: #f8f9fa;
+      border-left: 4px solid var(--warning-color);
+    }
+    
+    .threat-item.high {
+      border-left-color: var(--danger-color);
+    }
+    
+    .threat-item.medium {
+      border-left-color: var(--warning-color);
+    }
+    
+    .threat-item.low {
+      border-left-color: var(--success-color);
+    }
+    
+    .threat-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .threat-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .threat-severity {
+      font-size: 14px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: white;
+    }
+    
+    .threat-severity.high {
+      background-color: var(--danger-color);
+    }
+    
+    .threat-severity.medium {
+      background-color: var(--warning-color);
+    }
+    
+    .threat-severity.low {
+      background-color: var(--success-color);
+    }
+    
+    .threat-details {
+      margin-top: 10px;
+    }
+    
+    .threat-detail-item {
+      margin-bottom: 5px;
+    }
+    
+    .threat-detail-label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .code-block {
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+    
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .primary-button {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .primary-button:hover {
+      background-color: #2980b9;
+    }
+    
+    .danger-button {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .danger-button:hover {
+      background-color: #c0392b;
+    }
+    
+    .no-threats {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+    }
+    
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      margin-top: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.svg" alt="CyberSentry Logo" class="logo">
+    <h1>CyberSentry Threat Details</h1>
+  </header>
+  
+  <div class="container">
+    <div class="section" id="pageInfo">
+      <h2>Page Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">URL</div>
+          <div class="info-value" id="pageUrl">Loading...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Domain</div>
+          <div class="info-value" id="pageDomain">Loading...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Security Level</div>
+          <div class="info-value" id="securityLevel">Loading...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Last Scan</div>
+          <div class="info-value" id="lastScan">Loading...</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section" id="threatsList">
+      <h2>Detected Threats</h2>
+      <div id="threatsContainer" class="threats-list">
+        <!-- Threats will be added here dynamically -->
+        <div class="no-threats" id="noThreats">
+          Loading threat information...
+        </div>
+      </div>
+    </div>
+    
+    <div class="section" id="recommendations">
+      <h2>Security Recommendations</h2>
+      <ul id="recommendationsList">
+        <!-- Recommendations will be added here dynamically -->
+      </ul>
+    </div>
+    
+    <div class="actions">
+      <button class="primary-button" id="backButton">Back to Safety</button>
+      <button class="primary-button" id="refreshButton">Refresh Analysis</button>
+      <button class="danger-button" id="reportButton">Report False Positive</button>
+    </div>
+  </div>
+  
+  <footer>
+    CyberSentry v1.0.0 | © 2025 CyberSentry
+  </footer>
+  
+  <script>
+    // Threat category display names
+    const THREAT_CATEGORY_NAMES = {
+      'phishing': 'Phishing Attempt',
+      'malware': 'Malware Risk',
+      'crypto_mining': 'Crypto Mining Script',
+      'data_leakage': 'Data Privacy Risk',
+      'vulnerable_form': 'Insecure Form',
+      'insecure_connection': 'Insecure Connection',
+      'suspicious_redirect': 'Suspicious Redirect',
+      'known_threat': 'Known Security Threat',
+      'content_issue': 'Suspicious Content',
+      'SUSPICIOUS_ELEMENT': 'Suspicious Element',
+      'CRYPTO_MINER': 'Cryptocurrency Miner',
+      'DATA_EXFILTRATION': 'Data Exfiltration',
+      'OBFUSCATED_CODE': 'Obfuscated Code',
+      'INSECURE_SCRIPT': 'Insecure Script',
+      'INSECURE_IFRAME': 'Insecure Iframe',
+      'unknown': 'Security Risk'
+    };
+    
+    // Severity mapping
+    const SEVERITY_MAP = {
+      'phishing': 'high',
+      'malware': 'high',
+      'crypto_mining': 'high',
+      'data_leakage': 'medium',
+      'vulnerable_form': 'medium',
+      'insecure_connection': 'medium',
+      'suspicious_redirect': 'medium',
+      'known_threat': 'high',
+      'content_issue': 'medium',
+      'SUSPICIOUS_ELEMENT': 'medium',
+      'CRYPTO_MINER': 'high',
+      'DATA_EXFILTRATION': 'high',
+      'OBFUSCATED_CODE': 'high',
+      'INSECURE_SCRIPT': 'medium',
+      'INSECURE_IFRAME': 'medium'
+    };
+    
+    // Initialize page when DOM is loaded
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Get tab ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabId = urlParams.get('tabId');
+      
+      if (!tabId) {
+        showError('No tab specified. Please try again from the extension popup.');
+        return;
+      }
+      
+      // Load threat data
+      loadThreatData(tabId);
+      
+      // Set up button actions
+      document.getElementById('backButton').addEventListener('click', () => {
+        window.close();
+      });
+      
+      document.getElementById('refreshButton').addEventListener('click', () => {
+        loadThreatData(tabId);
+      });
+      
+      document.getElementById('reportButton').addEventListener('click', () => {
+        reportFalsePositive(tabId);
+      });
+    });
+    
+    // Load threat data for the specified tab
+    async function loadThreatData(tabId) {
+      try {
+        // Get security information from background script
+        chrome.runtime.sendMessage({ 
+          action: 'getSecurityInfo', 
+          tabId: parseInt(tabId) 
+        }, response => {
+          if (response) {
+            displayPageInfo(response);
+            displayThreats(response);
+            generateRecommendations(response);
+          } else {
+            showError('Could not retrieve security information for this tab.');
+          }
+        });
+      } catch (error) {
+        console.error('Error loading threat data:', error);
+        showError('An error occurred while loading threat data.');
+      }
+    }
+    
+    // Display page information
+    function displayPageInfo(securityInfo) {
+      if (securityInfo.url) {
+        document.getElementById('pageUrl').textContent = securityInfo.url;
+        
+        try {
+          const urlObj = new URL(securityInfo.url);
+          document.getElementById('pageDomain').textContent = urlObj.hostname;
+        } catch (e) {
+          document.getElementById('pageDomain').textContent = 'Unknown';
+        }
+      } else {
+        document.getElementById('pageUrl').textContent = 'Unknown';
+        document.getElementById('pageDomain').textContent = 'Unknown';
+      }
+      
+      // Set security level with appropriate styling
+      const securityLevelElement = document.getElementById('securityLevel');
+      let securityLevelText = 'Unknown';
+      let securityLevelClass = '';
+      
+      switch (securityInfo.securityLevel) {
+        case 'dangerous':
+          securityLevelText = 'Dangerous';
+          securityLevelClass = 'high';
+          break;
+        case 'suspicious':
+          securityLevelText = 'Suspicious';
+          securityLevelClass = 'medium';
+          break;
+        case 'warning':
+          securityLevelText = 'Warning';
+          securityLevelClass = 'medium';
+          break;
+        case 'safe':
+          securityLevelText = 'Safe';
+          securityLevelClass = 'low';
+          break;
+      }
+      
+      securityLevelElement.textContent = securityLevelText;
+      securityLevelElement.className = `info-value ${securityLevelClass}`;
+      
+      // Set last scan time
+      if (securityInfo.timestamp) {
+        document.getElementById('lastScan').textContent = new Date(securityInfo.timestamp).toLocaleString();
+      } else {
+        document.getElementById('lastScan').textContent = new Date().toLocaleString();
+      }
+    }
+    
+    // Display detected threats
+    function displayThreats(securityInfo) {
+      const threatsContainer = document.getElementById('threatsContainer');
+      const noThreatsElement = document.getElementById('noThreats');
+      
+      // Clear existing content
+      threatsContainer.innerHTML = '';
+      threatsContainer.appendChild(noThreatsElement);
+      
+      // Collect all threats
+      const threats = [];
+      
+      // Add URL/domain threats
+      if (securityInfo.threatCategory) {
+        threats.push({
+          category: securityInfo.threatCategory,
+          details: securityInfo.threatDetails || 'Suspicious or dangerous URL detected',
+          timestamp: securityInfo.timestamp
+        });
+      }
+      
+      // Add content threats
+      if (securityInfo.contentThreats && securityInfo.contentThreats.length > 0) {
+        threats.push(...securityInfo.contentThreats);
+      }
+      
+      // Add detected threats
+      if (securityInfo.detectedThreats && securityInfo.detectedThreats.length > 0) {
+        threats.push(...securityInfo.detectedThreats);
+      }
+      
+      // Show or hide the no threats message
+      if (threats.length > 0) {
+        noThreatsElement.style.display = 'none';
+        
+        // Create threat items
+        threats.forEach((threat, index) => {
+          const threatItem = document.createElement('div');
+          const category = threat.category.toLowerCase();
+          const severity = SEVERITY_MAP[category] || 'medium';
+          
+          threatItem.className = `threat-item ${severity}`;
+          
+          // Create threat content
+          let threatContent = `
+            <div class="threat-header">
+              <div class="threat-name">${THREAT_CATEGORY_NAMES[category] || 'Security Issue'}</div>
+              <div class="threat-severity ${severity}">${severity.charAt(0).toUpperCase() + severity.slice(1)}</div>
+            </div>
+            <div class="threat-details">
+              <div class="threat-detail-item">
+                <span class="threat-detail-label">Description:</span>
+                <span>${threat.details || 'No details available'}</span>
+              </div>
+          `;
+          
+          // Add timestamp if available
+          if (threat.timestamp) {
+            threatContent += `
+              <div class="threat-detail-item">
+                <span class="threat-detail-label">Detected:</span>
+                <span>${new Date(threat.timestamp).toLocaleString()}</span>
+              </div>
+            `;
+          }
+          
+          // Add location if available
+          if (threat.location) {
+            threatContent += `
+              <div class="threat-detail-item">
+                <span class="threat-detail-label">Location:</span>
+                <span>${threat.location}</span>
+              </div>
+            `;
+          }
+          
+          // Add element info if available
+          if (threat.details && threat.details.elementInfo) {
+            threatContent += `
+              <div class="threat-detail-item">
+                <span class="threat-detail-label">Element:</span>
+                <span>${threat.details.elementInfo.tagName || 'Unknown'}</span>
+              </div>
+            `;
+            
+            // Add code block for script content if available
+            if (threat.details.elementInfo.tagName === 'SCRIPT' && threat.details.elementInfo.content) {
+              threatContent += `
+                <div class="threat-detail-item">
+                  <span class="threat-detail-label">Script Content:</span>
+                  <div class="code-block">${escapeHtml(threat.details.elementInfo.content.substring(0, 200))}${threat.details.elementInfo.content.length > 200 ? '...' : ''}</div>
+                </div>
+              `;
+            }
+          }
+          
+          threatContent += '</div>';
+          threatItem.innerHTML = threatContent;
+          
+          // Add to the container
+          threatsContainer.appendChild(threatItem);
+        });
+      } else {
+        noThreatsElement.textContent = 'No threats detected on this page.';
+        noThreatsElement.style.display = 'block';
+      }
+    }
+    
+    // Generate security recommendations based on detected threats
+    function generateRecommendations(securityInfo) {
+      const recommendationsList = document.getElementById('recommendationsList');
+      recommendationsList.innerHTML = '';
+      
+      // Default recommendations
+      const recommendations = [
+        'Keep your browser and extensions up to date',
+        'Use strong, unique passwords for all websites',
+        'Enable two-factor authentication when available'
+      ];
+      
+      // Add specific recommendations based on threats
+      if (securityInfo.threatCategory === 'phishing') {
+        recommendations.unshift(
+          'Never enter personal information on suspicious websites',
+          'Verify the website URL before entering sensitive information',
+          'Contact the company directly if you receive suspicious requests'
+        );
+      } else if (securityInfo.threatCategory === 'malware') {
+        recommendations.unshift(
+          'Scan your device with an antivirus program',
+          'Avoid downloading files from untrusted sources',
+          'Keep your operating system updated'
+        );
+      } else if (securityInfo.contentThreats && securityInfo.contentThreats.some(t => t.category === 'crypto_mining')) {
+        recommendations.unshift(
+          'Use a script blocker extension for additional protection',
+          'Monitor your device for unusual CPU usage',
+          'Avoid staying on suspicious websites'
+        );
+      } else if (securityInfo.securityLevel === 'warning' || securityInfo.securityLevel === 'suspicious') {
+        recommendations.unshift(
+          'Proceed with caution on this website',
+          'Do not enter sensitive information',
+          'Report suspicious activity to the website owner'
+        );
+      }
+      
+      // Add recommendations to the list
+      recommendations.forEach(recommendation => {
+        const li = document.createElement('li');
+        li.textContent = recommendation;
+        recommendationsList.appendChild(li);
+      });
+    }
+    
+    // Report a false positive
+    function reportFalsePositive(tabId) {
+      // In a real extension, this would send a report to the server
+      alert('Thank you for reporting this issue. Our security team will review this website and update our detection systems if necessary.');
+    }
+    
+    // Show error message
+    function showError(message) {
+      const pageInfo = document.getElementById('pageInfo');
+      pageInfo.innerHTML = `
+        <h2>Error</h2>
+        <div style="color: var(--danger-color); padding: 20px; text-align: center;">
+          ${message}
+        </div>
+      `;
+      
+      document.getElementById('noThreats').textContent = 'Could not load threat information.';
+      document.getElementById('recommendationsList').innerHTML = '<li>Try refreshing the analysis or restarting the extension.</li>';
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html> 

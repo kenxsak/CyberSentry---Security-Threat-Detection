@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSentry</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --danger-color: #e74c3c;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --text-color: #333;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 350px;
+      min-height: 300px;
+      color: var(--text-color);
+      background-color: #f8f9fa;
+    }
+    
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-bottom: 3px solid var(--secondary-color);
+    }
+    
+    h1 {
+      font-size: 18px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    h2 {
+      font-size: 16px;
+      margin: 15px 0 10px;
+      color: var(--primary-color);
+    }
+    
+    .logo {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    
+    .container {
+      padding: 15px;
+    }
+    
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--secondary-color);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .status-overview {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .status-text {
+      font-weight: bold;
+      flex-grow: 1;
+    }
+    
+    .scan-time {
+      font-size: 12px;
+      color: #777;
+    }
+    
+    .status-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .status-item {
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      text-align: center;
+    }
+    
+    .status-item.secure {
+      background-color: rgba(46, 204, 113, 0.2);
+      color: #27ae60;
+    }
+    
+    .status-item.warning {
+      background-color: rgba(243, 156, 18, 0.2);
+      color: #d35400;
+    }
+    
+    .status-item.danger {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #c0392b;
+    }
+    
+    .status-item.unknown {
+      background-color: rgba(189, 195, 199, 0.2);
+      color: #7f8c8d;
+    }
+    
+    .threat-details {
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .threats-list {
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .threat-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .threat-severity {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+    
+    .threat-severity.high {
+      background-color: var(--danger-color);
+    }
+    
+    .threat-severity.medium {
+      background-color: var(--warning-color);
+    }
+    
+    .threat-severity.low {
+      background-color: var(--success-color);
+    }
+    
+    .threat-info {
+      flex-grow: 1;
+    }
+    
+    .threat-name {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+    
+    .threat-description {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 3px;
+    }
+    
+    .threat-location {
+      font-size: 11px;
+      color: #777;
+      font-style: italic;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--secondary-color);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    button.danger {
+      background-color: var(--danger-color);
+    }
+    
+    button.danger:hover {
+      background-color: #c0392b;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+    
+    .tab-button {
+      padding: 8px 15px;
+      background-color: transparent;
+      color: var(--text-color);
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    
+    .tab-button.active {
+      border-bottom: 2px solid var(--secondary-color);
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .stat-box {
+      background-color: white;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--secondary-color);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #777;
+    }
+    
+    .settings-list {
+      background-color: white;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-size: 13px;
+    }
+    
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+    
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #777;
+      padding: 10px;
+      border-top: 1px solid #eee;
+    }
+    
+    .error-message {
+      background-color: rgba(231, 76, 60, 0.1);
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px;
+      text-align: center;
+    }
+    
+    .error-message button {
+      margin-top: 10px;
+      background-color: var(--danger-color);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="icons/icon16.svg" alt="CyberSentry Logo" class="logo">
+      CyberSentry Security
+    </h1>
+  </header>
+  
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Analyzing security...</p>
+  </div>
+  
+  <div id="mainContent" style="display: none;">
+    <div class="container">
+      <div class="status-overview">
+        <div id="statusDot" class="status-dot"></div>
+        <div id="statusText" class="status-text">Unknown</div>
+        <div id="scanTime" class="scan-time">00:00:00</div>
+      </div>
+      
+      <div class="status-details">
+        <div id="connectionStatus" class="status-item unknown">Unknown</div>
+        <div id="contentStatus" class="status-item unknown">Unknown</div>
+        <div id="privacyStatus" class="status-item unknown">Unknown</div>
+        <div id="domainStatus" class="status-item unknown">Unknown</div>
+      </div>
+      
+      <div id="threatDetails" class="threat-details">
+        <h2>Detected Threats</h2>
+        <div id="threatsList" class="threats-list"></div>
+        <div class="action-buttons">
+          <button id="detailsButton">View Details</button>
+          <button id="reportButton">Report Issue</button>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-button active" data-tab="overviewTab">Overview</button>
+        <button class="tab-button" data-tab="statsTab">Statistics</button>
+        <button class="tab-button" data-tab="settingsTab">Settings</button>
+      </div>
+      
+      <div id="overviewTab" class="tab-content active">
+        <!-- Overview content is shown by default -->
+      </div>
+      
+      <div id="statsTab" class="tab-content">
+        <h2>Security Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div id="sitesVisited" class="stat-value">0</div>
+            <div class="stat-label">Sites Visited</div>
+          </div>
+          <div class="stat-box">
+            <div id="threatsBlocked" class="stat-value">0</div>
+            <div class="stat-label">Threats Blocked</div>
+          </div>
+          <div class="stat-box">
+            <div id="vulnerabilitiesFound" class="stat-value">0</div>
+            <div class="stat-label">Vulnerabilities</div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="settingsTab" class="tab-content">
+        <h2>Security Settings</h2>
+        <div class="settings-list">
+          <div class="detail-item">
+            <span class="detail-label">Block Known Threats</span>
+            <input type="checkbox" id="blockThreats" checked>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Scan Page Content</span>
+            <input type="checkbox" id="scanContent" checked>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Monitor Script Activity</span>
+            <input type="checkbox" id="monitorScripts" checked>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Check Forms for Security</span>
+            <input type="checkbox" id="checkForms" checked>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Show Notifications</span>
+            <input type="checkbox" id="showNotifications" checked>
+          </div>
+          <div class="action-buttons">
+            <button id="saveSettings">Save Settings</button>
+            <button id="resetStats" class="danger">Reset Statistics</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    CyberSentry v1.0.0 | © 2025 CyberSentry
+  </footer>
+  
+  <script src="popup.js"></script>
+</body>
+</html> 
